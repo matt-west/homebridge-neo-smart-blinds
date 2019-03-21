@@ -1,4 +1,5 @@
 const rp = require('request-promise');
+const url = require('url');
 const localStorage = new require('node-localstorage').LocalStorage('/tmp/neo-smart-blinds');
 let Service, Characteristic;
  
@@ -124,13 +125,12 @@ blinds.prototype = {
     const _this = this;
     const timeHash = new Date().getTime().toString().slice(-7);
 
-    const requestUrl = new URL('http://' + _this.controllerIP);
-    requestUrl.port = 8838;
+    const requestUrl = url.parse('http://' + _this.controllerIP + ':8838');
     requestUrl.pathname = '/neo/v1/transmit';
     requestUrl.search = 'id=' + _this.controllerID + '&command=' + _this.blindCode + '-' + command + '&hash=' + timeHash;
 
     return rp({
-      uri: requestUrl.toString(),
+      uri: url.format(requestUrl),
       method: 'GET',
       resolveWithFullResponse: true
     });
